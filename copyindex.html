@@ -512,7 +512,9 @@
                             <input type="color" id="textColor" value="#000000">
                             <div class="color-value" id="textColorValue">#000000</div>
                         </div>
-                        <label>الألوان السريعة</label>
+                    </div>
+
+                    <label>الألوان السريعة</label>
                     <div class="quick-colors" id="quickColors">
                         <div class="quick-color" data-color="#000000" style="background:#000000;"></div>
                         <div class="quick-color" data-color="#8B4513" style="background:#8B4513;"></div>
@@ -521,23 +523,32 @@
                         <div class="quick-color" data-color="#FFD700" style="background:#FFD700;"></div>
                         <div class="quick-color" data-color="#4B0082" style="background:#4B0082;"></div>
                     </div>
-                    </div>
 
-                    <div class="checkbox-group" style="margin-top:10px;">
+                    <!-- <div class="checkbox-group" style="margin-top:10px;">
                         <input type="checkbox" id="transparentBg">
                         <label for="transparentBg">خلفية شفافة</label>
-                    </div>
+                    </div> -->
 
-                    <div class="color-section">
-                        <label>لون الخلفية <span style="font-size:0.85em;color:#666;">(انقر شفاف لإزالة
-                                الخلفية)</span></label>
-                        <div class="color-input-group">
-                            <input type="color" id="bgColor" value="#ffffff">
-                            <div class="color-value" id="bgColorValue">#ffffff</div>
+                    <div class="control-group">
+                        <label>خلفية النص</label>
+                        <div class="button-group">
+                            <button class="btn-primary" id="bgSolid">صلب</button>
+                            <button class="btn-primary" id="bgGradient">تدرج</button>
+                            <button class="btn-primary" id="bgTransparent">شفاف</button>
                         </div>
+                        <input type="file" id="bgImageUpload" accept="image/*" style="margin-top:8px;">
+                        <button class="btn-primary" id="removeBgImage" style="margin-top:4px;">إزالة الصورة</button>
                     </div>
 
-                    
+                    <!-- <label>الألوان السريعة</label>
+                    <div class="quick-colors" id="quickColors">
+                        <div class="quick-color" data-color="#000000" style="background:#000000;"></div>
+                        <div class="quick-color" data-color="#8B4513" style="background:#8B4513;"></div>
+                        <div class="quick-color" data-color="#006400" style="background:#006400;"></div>
+                        <div class="quick-color" data-color="#DC143C" style="background:#DC143C;"></div>
+                        <div class="quick-color" data-color="#FFD700" style="background:#FFD700;"></div>
+                        <div class="quick-color" data-color="#4B0082" style="background:#4B0082;"></div>
+                    </div> -->
                 </div>
 
                 <div class="control-group">
@@ -550,12 +561,12 @@
                     <div style="font-size:0.85rem;color:#666;margin-top:8px;text-align:center">الحالي: تدفق النص العربي
                         الطبيعي من اليمين إلى اليسار</div>
                 </div>
-
-                <!-- <div class="button-group">
+                <!-- 
+                <div class="button-group">
                     <button class="btn-primary" id="downloadPng">⬇️ تنزيل PNG (شفاف)</button>
                     <button class="btn-success" id="downloadJpg">⬇️ تنزيل JPG (خلفية بيضاء)</button>
-                </div> -->
-
+                </div>
+ -->
 
 
 
@@ -590,7 +601,7 @@
                     <input type="range" id="textBlur" min="0" max="10" step="0.5" value="0">
                 </div>
 
-               
+
             </div>
 
             <!-- CENTER: PREVIEW -->
@@ -598,7 +609,8 @@
                 <div id="preview" role="img" aria-label="معاينة الخط">
                     بسم الله الرحمن الرحيم
                 </div>
-                 <div class="button-group">
+
+                <div class="button-group">
                     <button class="btn-primary" id="downloadPng">⬇️ تنزيل PNG (شفاف)</button>
                     <button class="btn-success" id="downloadJpg">⬇️ تنزيل JPG (خلفية بيضاء)</button>
                 </div>
@@ -897,113 +909,124 @@
     </script>
     <script>
         // font style
-const boldStyle = document.getElementById('boldStyle');
-const italicStyle = document.getElementById('italicStyle');
+        const boldStyle = document.getElementById('boldStyle');
+        const italicStyle = document.getElementById('italicStyle');
 
-// stroke
-const strokeWidth = document.getElementById('strokeWidth');
-const strokeColor = document.getElementById('strokeColor');
+        // stroke
+        const strokeWidth = document.getElementById('strokeWidth');
+        const strokeColor = document.getElementById('strokeColor');
 
-// shadow
-const shadowColor = document.getElementById('shadowColor');
-const shadowBlur = document.getElementById('shadowBlur');
-const shadowX = document.getElementById('shadowX');
-const shadowY = document.getElementById('shadowY');
+        // shadow
+        const shadowColor = document.getElementById('shadowColor');
+        const shadowBlur = document.getElementById('shadowBlur');
+        const shadowX = document.getElementById('shadowX');
+        const shadowY = document.getElementById('shadowY');
 
-// letter spacing & line height
-const letterSpacing = document.getElementById('letterSpacing');
-const letterSpacingVal = document.getElementById('letterSpacingVal');
-const lineHeight = document.getElementById('lineHeight');
-const lineHeightVal = document.getElementById('lineHeightVal');
+        // letter spacing & line height
+        const letterSpacing = document.getElementById('letterSpacing');
+        const letterSpacingVal = document.getElementById('letterSpacingVal');
+        const lineHeight = document.getElementById('lineHeight');
+        const lineHeightVal = document.getElementById('lineHeightVal');
 
-// blur
-const textBlur = document.getElementById('textBlur');
+        // blur
+        const textBlur = document.getElementById('textBlur');
 
-// background
-const bgSolid = document.getElementById('bgSolid');
-const bgGradient = document.getElementById('bgGradient');
-const bgTransparentBtn = document.getElementById('bgTransparent');
-const bgImageUpload = document.getElementById('bgImageUpload');
-const removeBgImage = document.getElementById('removeBgImage');
+        // background
+        const bgSolid = document.getElementById('bgSolid');
+        const bgGradient = document.getElementById('bgGradient');
+        const bgTransparentBtn = document.getElementById('bgTransparent');
+        const bgImageUpload = document.getElementById('bgImageUpload');
+        const removeBgImage = document.getElementById('removeBgImage');
 
-let bgImageUrl = null;
-let bgMode = 'solid'; // 'solid', 'gradient', 'transparent', 'image'
+        let bgImageUrl = null;
+        let bgMode = 'solid'; // 'solid', 'gradient', 'transparent', 'image'
 
-// ---------- event listeners ----------
-[boldStyle, italicStyle, strokeWidth, strokeColor, shadowColor, shadowBlur, shadowX, shadowY,
- letterSpacing, lineHeight, textBlur].forEach(el => {
-    el.addEventListener('input', updatePreview);
-});
+        // ---------- event listeners ----------
+        [boldStyle, italicStyle, strokeWidth, strokeColor, shadowColor, shadowBlur, shadowX, shadowY,
+            letterSpacing, lineHeight, textBlur].forEach(el => {
+                el.addEventListener('input', updatePreview);
+            });
 
-[bgSolid, bgGradient, bgTransparentBtn].forEach(btn => {
-    btn.addEventListener('click', () => {
-        bgMode = btn.id === 'bgSolid' ? 'solid' : btn.id === 'bgGradient' ? 'gradient' : 'transparent';
-        updatePreview();
-    });
-});
+        [bgSolid, bgGradient, bgTransparentBtn].forEach(btn => {
+            btn.addEventListener('click', () => {
+                bgMode = btn.id === 'bgSolid' ? 'solid' : btn.id === 'bgGradient' ? 'gradient' : 'transparent';
+                updatePreview();
+            });
+        });
 
-bgImageUpload.addEventListener('change', (e) => {
-    if (e.target.files && e.target.files[0]) {
-        bgImageUrl = URL.createObjectURL(e.target.files[0]);
-        bgMode = 'image';
-        updatePreview();
-    }
-});
+        bgImageUpload.addEventListener('change', (e) => {
+            if (e.target.files && e.target.files[0]) {
+                bgImageUrl = URL.createObjectURL(e.target.files[0]);
+                bgMode = 'image';
+                updatePreview();
+            }
+        });
 
-removeBgImage.addEventListener('click', () => {
-    bgImageUrl = null;
-    bgMode = 'solid';
-    updatePreview();
-});
+        removeBgImage.addEventListener('click', () => {
+            bgImageUrl = null;
+            // reset mode to transparent if checked, otherwise solid
+            bgMode = transparentBg.checked ? 'transparent' : 'solid';
+            preview.style.background = ''; // remove previous image background immediately
+            updatePreview();
+        });
 
-// ---------- updatePreview modifications ----------
-function updatePreview() {
-    const text = arabicText.value || '';
-    preview.textContent = text || 'اكتب النص هنا';
-    preview.style.fontFamily = `${safeFontFamily(fontFamily.value)}, sans-serif`;
-    preview.style.fontSize = parseInt(fontSize.value,10) + 'px';
-    preview.style.color = textColor.value;
 
-    // font style
-    preview.style.fontWeight = boldStyle.checked ? '700' : '400';
-    preview.style.fontStyle = italicStyle.checked ? 'italic' : 'normal';
+        // ---------- updatePreview modifications ----------
+        function updatePreview() {
+            const text = arabicText.value || '';
+            preview.textContent = text || 'اكتب النص هنا';
+            preview.style.fontFamily = `${safeFontFamily(fontFamily.value)}, sans-serif`;
+            preview.style.fontSize = parseInt(fontSize.value, 10) + 'px';
+            preview.style.color = textColor.value;
 
-    // stroke
-    preview.style.webkitTextStroke = `${strokeWidth.value}px ${strokeColor.value}`;
+            // font style
+            preview.style.fontWeight = boldStyle.checked ? '700' : '400';
+            preview.style.fontStyle = italicStyle.checked ? 'italic' : 'normal';
 
-    // shadow
-    preview.style.textShadow = `${shadowX.value}px ${shadowY.value}px ${shadowBlur.value}px ${shadowColor.value}`;
+            // stroke
+            preview.style.webkitTextStroke = `${strokeWidth.value}px ${strokeColor.value}`;
 
-    // letter spacing & line height
-    preview.style.letterSpacing = letterSpacing.value + 'px';
-    letterSpacingVal.textContent = letterSpacing.value;
-    preview.style.lineHeight = lineHeight.value;
-    lineHeightVal.textContent = lineHeight.value;
+            // shadow
+            preview.style.textShadow = `${shadowX.value}px ${shadowY.value}px ${shadowBlur.value}px ${shadowColor.value}`;
 
-    // blur
-    preview.style.filter = `blur(${textBlur.value}px)`;
+            // letter spacing & line height
+            preview.style.letterSpacing = letterSpacing.value + 'px';
+            letterSpacingVal.textContent = letterSpacing.value;
+            preview.style.lineHeight = lineHeight.value;
+            lineHeightVal.textContent = lineHeight.value;
 
-    // background
-    if (bgMode === 'transparent') {
-        preview.style.background = 'repeating-linear-gradient(45deg, #f8f8f8 0, #f8f8f8 10px, #ffffff 10px, #ffffff 20px)';
-    } else if (bgMode === 'gradient') {
-        preview.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
-    } else if (bgMode === 'image' && bgImageUrl) {
-        preview.style.background = `url(${bgImageUrl}) center/cover no-repeat`;
-    } else {
-        preview.style.background = bgColor.value || '#ffffff';
-    }
+            // blur
+            preview.style.filter = `blur(${textBlur.value}px)`;
 
-    // update stats & font description
-    const chars = countChars(text);
-    charCount.textContent = chars;
-    statChars.textContent = chars;
-    statSize.textContent = fontSize.value + 'px';
-    statAlign.textContent = preview.style.textAlign === 'right' ? 'يمين' :
-                            preview.style.textAlign === 'center' ? 'وسط' : 'يسار';
-}
+            // background
+            // background
+            if (bgMode === 'transparent') {
+                preview.style.background = 'repeating-linear-gradient(45deg, #f8f8f8 0, #f8f8f8 10px, #ffffff 10px, #ffffff 20px)';
+            } else if (bgMode === 'gradient') {
+                preview.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+            } else if (bgMode === 'image' && bgImageUrl) {
+                preview.style.background = `url(${bgImageUrl}) center/cover no-repeat`;
+            } else {
+                // solid color fallback
+                preview.style.background = bgColor.value || '#ffffff';
+            }
+
+
+            // update stats & font description
+            const chars = countChars(text);
+            charCount.textContent = chars;
+            statChars.textContent = chars;
+            statSize.textContent = fontSize.value + 'px';
+            statAlign.textContent = preview.style.textAlign === 'right' ? 'يمين' :
+                preview.style.textAlign === 'center' ? 'وسط' : 'يسار';
+        }
 
     </script>
+
+
+
+
+
 </body>
 
 </html>

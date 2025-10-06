@@ -1,0 +1,566 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Arabic Calligraphy Generator — Clone (Functional)</title>
+  <!-- Load Google Fonts (many families) -->
+  <link
+    href="https://fonts.googleapis.com/css2?display=swap&family=Amiri&family=Aref+Ruqaa&family=Rakkas&family=Lateef&family=Scheherazade+New&family=Katibeh&family=Reem+Kufi&family=Noto+Kufi+Arabic&family=Kufam&family=Noto+Naskh+Arabic&family=Cairo:wght@300;400;700&family=Tajawal&family=Almarai&family=Changa&family=Marhey&family=Harmattan&family=El+Messiri&family=Mada&family=Readex+Pro&family=IBM+Plex+Sans+Arabic&family=Lalezar&family=Jomhuria&family=Vibes&family=Baloo+Bhaijaan+2&family=Markazi+Text&family=Mirza"
+    rel="stylesheet">
+  <style>
+    :root {
+      --accent: #e67e22;
+      --border: #e5e7eb;
+      --bg: #fff
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      background: #fff7f0;
+      color: #111
+    }
+
+    .wrap {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 18px
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border)
+    }
+
+    header h1 {
+      font-size: 18px;
+      margin: 0;
+      font-weight: 600
+    }
+
+    .tool {
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      gap: 18px;
+      margin-top: 18px
+    }
+
+    .panel {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px
+    }
+
+    .tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 14px
+    }
+
+    .tab {
+      flex: 1;
+      text-align: center;
+      padding: 8px;
+      border-radius: 6px;
+      cursor: pointer;
+      background: #f8fafc;
+      font-size: 14px
+    }
+
+    .tab.active {
+      background: var(--accent);
+      color: #fff;
+      font-weight: 600
+    }
+
+    .tab-content {
+      display: none
+    }
+
+    .tab-content.active {
+      display: block
+    }
+
+    label {
+      font-size: 13px;
+      color: #374151;
+      margin-top: 8px;
+      display: block
+    }
+
+    textarea,
+    select,
+    input[type=text],
+    input[type=number],
+    input[type=color] {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 14px
+    }
+
+    .row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin-top: 6px
+    }
+
+    .small {
+      width: 84px
+    }
+
+    button {
+      background: var(--accent);
+      color: #fff;
+      padding: 8px 12px;
+      border: 0;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px
+    }
+
+    button.alt {
+      background: #374151
+    }
+
+    .preview-area {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px
+    }
+
+    .preview {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      min-height: 260px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #fff
+    }
+
+    .preview svg {
+      max-width: 100%;
+      max-height: 100%
+    }
+
+    .downloads {
+      display: flex;
+      gap: 10px
+    }
+
+    .featured {
+      margin-top: 16px
+    }
+
+    .featured h3 {
+      font-size: 15px;
+      margin-bottom: 8px
+    }
+
+    .designs {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px
+    }
+
+    .design {
+      padding: 12px;
+      border-radius: 8px;
+      text-align: center;
+      cursor: pointer;
+      font-size: 16px
+    }
+
+    .quick-links {
+      margin-top: 16px;
+      display: flex;
+      gap: 10px
+    }
+
+    .quick-links a {
+      flex: 1;
+      text-align: center;
+      padding: 8px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      text-decoration: none;
+      color: #374151;
+      font-size: 14px
+    }
+
+    .templates-popup {
+      position: absolute;
+      background: #fff;
+      border: 1px solid var(--border);
+      padding: 10px;
+      border-radius: 8px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      display: none;
+      z-index: 50
+    }
+
+    .templates-popup button {
+      display: block;
+      width: 100%;
+      text-align: left;
+      margin-bottom: 6px;
+      background: #f8fafc;
+      color: #111;
+      padding: 6px;
+      border-radius: 6px
+    }
+
+    @media (max-width:960px) {
+      .tool {
+        grid-template-columns: 1fr
+      }
+
+      .preview {
+        min-height: 200px
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <header>
+      <div
+        style="width:44px;height:44px;border-radius:6px;background:var(--accent);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700">
+        خط</div>
+      <h1>Arabic Calligraphy Generator — Clone (Functional)</h1>
+    </header>
+
+    <div class="tool">
+      <div class="panel" style="position:relative">
+        <div class="tabs">
+          <div class="tab active" data-tab="text">Text</div>
+          <div class="tab" data-tab="style">Style</div>
+          <div class="tab" data-tab="advanced">Advanced</div>
+        </div>
+
+        <div id="tab-text" class="tab-content active">
+          <label>Arabic Text <small style="color:#6b7280;float:right">Show Keyboard</small></label>
+          <textarea id="text" rows="3">بسم الله الرحمن الرحيم</textarea>
+
+          <div class="row" style="justify-content:space-between;margin-top:8px">
+            <div style="position:relative">
+              <button id="templates">Templates ▾</button>
+              <div id="templatesPopup" class="templates-popup" style="width:220px">
+                <button data-val="بسم الله الرحمن الرحيم">بسم الله الرحمن الرحيم</button>
+                <button data-val="الحمد لله">الحمد لله</button>
+                <button data-val="سبحان الله">سبحان الله</button>
+                <button data-val="الله أكبر">الله أكبر</button>
+              </div>
+            </div>
+            <button id="reset">Reset Text</button>
+          </div>
+
+          <label>Font</label>
+          <select id="font">
+            <option value="Amiri">أميري - Amiri</option>
+            <option value="Aref Ruqaa">عارف رقعة - Aref Ruqaa</option>
+            <option value="Rakkas">رقّاص - Rakkas</option>
+            <option value="Lateef">لطيف - Lateef</option>
+            <option value="Scheherazade New">شهرزاد - Scheherazade New</option>
+            <option value="Katibeh">كاتبة - Katibeh</option>
+            <option value="Reem Kufi">ريم كوفي - Reem Kufi</option>
+            <option value="Noto Kufi Arabic">نوتو كوفي - Noto Kufi Arabic</option>
+            <option value="Kufam">كوفام - Kufam</option>
+            <option value="Noto Naskh Arabic">نوتو نسخ - Noto Naskh Arabic</option>
+            <option value="Cairo">القاهرة - Cairo</option>
+            <option value="Tajawal">تجوال - Tajawal</option>
+            <option value="Almarai">المرعي - Almarai</option>
+            <option value="Changa">شنقا - Changa</option>
+            <option value="Marhey">مرحي - Marhey</option>
+            <option value="Harmattan">هرمتان - Harmattan</option>
+            <option value="El Messiri">المسيري - El Messiri</option>
+            <option value="Mada">مدى - Mada</option>
+            <option value="Readex Pro">ريدكس برو - Readex Pro</option>
+            <option value="IBM Plex Sans Arabic">IBM عربي - IBM Plex Sans Arabic</option>
+            <option value="Lalezar">لالزار - Lalezar</option>
+            <option value="Jomhuria">جمهورية - Jomhuria</option>
+            <option value="Vibes">فايبس - Vibes</option>
+            <option value="Blaka">بلاكا - Blaka</option>
+            <option value="Baloo Bhaijaan 2">بالو بهايجان - Baloo Bhaijaan 2</option>
+            <option value="Markazi Text">مركزي - Markazi Text</option>
+            <option value="Mirza">ميرزا - Mirza</option>
+          </select>
+
+          <label>Font Weight</label>
+          <select id="weight">
+            <option value="400">Regular</option>
+            <option value="700">Bold</option>
+            <option value="300">Light</option>
+          </select>
+
+          <label>Font Style</label>
+          <select id="fstyle">
+            <option value="normal">Normal</option>
+            <option value="italic">Italic</option>
+          </select>
+        </div>
+
+        <div id="tab-style" class="tab-content">
+          <label>Font Size</label>
+          <input id="size" type="number" value="72" min="16" max="400" />
+
+          <label>Text Color</label>
+          <input id="color" type="color" value="#0f172a" />
+
+          <label style="margin-top:10px">Gradient</label>
+          <div class="row">
+            <input id="useGradient" type="checkbox" /> <label for="useGradient"
+              style="margin-left:6px;color:#6b7280">Enable</label>
+          </div>
+          <div class="row" style="margin-top:6px">
+            <input id="grad1" type="color" value="#0ea5e9" />
+            <input id="grad2" type="color" value="#7c3aed" />
+          </div>
+
+          <label style="margin-top:10px">Stroke</label>
+          <div class="row">
+            <input id="strokeWidth" class="small" type="number" value="0" />
+            <input id="strokeColor" type="color" value="#000000" />
+          </div>
+
+          <label style="margin-top:10px">Shadow</label>
+          <div class="row">
+            <input id="shadowX" class="small" type="number" value="0" />
+            <input id="shadowY" class="small" type="number" value="6" />
+            <input id="shadowBlur" class="small" type="number" value="10" />
+          </div>
+        </div>
+
+        <div id="tab-advanced" class="tab-content">
+          <label>Alignment</label>
+          <select id="align">
+            <option value="center">Center</option>
+            <option value="right">Right</option>
+            <option value="left">Left</option>
+          </select>
+
+          <label style="margin-top:8px">Background</label>
+          <div class="row">
+            <select id="bgType">
+              <option value="transparent">Transparent</option>
+              <option value="solid">Solid</option>
+            </select>
+            <input id="bgColor" type="color" value="#ffffff" />
+          </div>
+
+          <label style="margin-top:8px">Output Resolution</label>
+          <select id="format">
+            <option value="400">400px</option>
+            <option value="1600">1600px</option>
+            <option value="2400">2400px</option>
+          </select>
+
+          <div style="margin-top:12px;color:#6b7280;font-size:13px">Tip: Use higher resolution for print-quality PNGs.
+          </div>
+        </div>
+
+        <div class="quick-links">
+          <a href="#">Blog</a>
+          <a href="#">FAQ</a>
+        </div>
+      </div>
+
+      <div class="preview-area panel">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <strong>Preview</strong>
+          <div>
+            <button id="copySvg" class="alt">Copy SVG</button>
+            <button id="share" class="alt">Share</button>
+          </div>
+        </div>
+
+        <div class="preview" id="preview"></div>
+
+        <div class="downloads">
+          <button id="downloadPng">Download PNG</button>
+          <button id="downloadSvg" class="alt">Download SVG</button>
+        </div>
+
+        <div class="featured">
+          <h3>Featured Designs</h3>
+          <div class="designs">
+            <div class="design" style="background:#fef3c7" data-t="بسم الله الرحمن الرحيم">بسم الله الرحمن الرحيم</div>
+            <div class="design" style="background:#d1fae5" data-t="الحمد لله">الحمد لله</div>
+            <div class="design" style="background:#ede9fe" data-t="سبحان الله">سبحان الله</div>
+            <div class="design" style="background:#fee2e2" data-t="الله أكبر">الله أكبر</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    // --- Tab switching ---
+    const tabs = document.querySelectorAll('.tab');
+    const contents = document.querySelectorAll('.tab-content');
+    tabs.forEach(t => t.addEventListener('click', () => {
+      tabs.forEach(x => x.classList.remove('active'));
+      contents.forEach(c => c.classList.remove('active'));
+      t.classList.add('active');
+      document.getElementById('tab-' + t.dataset.tab).classList.add('active');
+    }));
+
+    // --- Templates popup ---
+    const tplBtn = document.getElementById('templates');
+    const tplPopup = document.getElementById('templatesPopup');
+    if (tplBtn) { tplBtn.addEventListener('click', (e) => { e.stopPropagation(); tplPopup.style.display = tplPopup.style.display === 'block' ? 'none' : 'block'; }); }
+    if (tplPopup) { tplPopup.querySelectorAll('button').forEach(b => b.addEventListener('click', () => { document.getElementById('text').value = b.dataset.val; tplPopup.style.display = 'none'; renderPreview(); })); }
+    document.addEventListener('click', (e) => { if (tplPopup && !tplBtn.contains(e.target) && !tplPopup.contains(e.target)) tplPopup.style.display = 'none'; });
+
+    // --- Featured designs click ---
+    document.querySelectorAll('.design').forEach(d => d.addEventListener('click', () => { document.getElementById('text').value = d.dataset.t; renderPreview(); }));
+
+    // --- Reset text ---
+    const resetBtn = document.getElementById('reset'); if (resetBtn) resetBtn.addEventListener('click', () => { document.getElementById('text').value = 'بسم الله الرحمن الرحيم'; renderPreview(); });
+
+    // --- Font mapping ---
+    const FONT_MAP = {
+      'Amiri': 'Amiri',
+      'Aref Ruqaa': 'Aref Ruqaa',
+      'Rakkas': 'Rakkas',
+      'Lateef': 'Lateef',
+      'Scheherazade New': 'Scheherazade New',
+      'Katibeh': 'Katibeh',
+      'Reem Kufi': 'Reem Kufi',
+      'Noto Kufi Arabic': 'Noto Kufi Arabic',
+      'Kufam': 'Kufam',
+      'Noto Naskh Arabic': 'Noto Naskh Arabic',
+      'Cairo': 'Cairo',
+      'Tajawal': 'Tajawal',
+      'Almarai': 'Almarai',
+      'Changa': 'Changa',
+      'Marhey': 'Marhey',
+      'Harmattan': 'Harmattan',
+      'El Messiri': 'El Messiri',
+      'Mada': 'Mada',
+      'Readex Pro': 'Readex Pro',
+      'IBM Plex Sans Arabic': 'IBM Plex Sans Arabic',
+      'Lalezar': 'Lalezar',
+      'Jomhuria': 'Jomhuria',
+      'Vibes': 'Vibes',
+      'Blaka': 'Blaka',
+      'Baloo Bhaijaan 2': 'Baloo Bhaijaan 2',
+      'Markazi Text': 'Markazi Text',
+      'Mirza': 'Mirza'
+    };
+
+    function escapeXml(s) { return String(s).replace(/[&<>\"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '\"': '&quot;', "'": "&apos;" })[c]); }
+
+    function getOpts() {
+      return {
+        text: document.getElementById('text').value || '',
+        font: document.getElementById('font').value,
+        weight: document.getElementById('weight').value,
+        fstyle: document.getElementById('fstyle').value,
+        size: parseInt(document.getElementById('size').value, 10) || 72,
+        color: document.getElementById('color').value || '#000000',
+        useGradient: document.getElementById('useGradient').checked,
+        grad1: document.getElementById('grad1').value || '#000000',
+        grad2: document.getElementById('grad2').value || '#ffffff',
+        strokeWidth: parseFloat(document.getElementById('strokeWidth').value) || 0,
+        strokeColor: document.getElementById('strokeColor').value || '#000000',
+        shadowX: parseFloat(document.getElementById('shadowX').value) || 0,
+        shadowY: parseFloat(document.getElementById('shadowY').value) || 0,
+        shadowBlur: parseFloat(document.getElementById('shadowBlur').value) || 0,
+        align: document.getElementById('align').value || 'center',
+        bgType: document.getElementById('bgType').value || 'transparent',
+        bgColor: document.getElementById('bgColor').value || '#ffffff',
+        format: parseInt(document.getElementById('format').value, 10) || 800
+      };
+    }
+
+    function buildSVG(opts) {
+      const w = Math.round(opts.format * 1.6);
+      const h = Math.round(opts.format);
+      const fontFamily = FONT_MAP[opts.font] || opts.font;
+      const fontSize = opts.size;
+      const anchor = opts.align === 'right' ? 'end' : (opts.align === 'left' ? 'start' : 'middle');
+      const x = opts.align === 'right' ? (w - 60) : (opts.align === 'left' ? 60 : Math.round(w / 2));
+      const lines = opts.text.split('\n').filter(Boolean);
+      const lineHeight = Math.round(fontSize * 1.05);
+      const totalH = lines.length * lineHeight;
+      const startY = Math.round((h - totalH) / 2) + fontSize;
+
+      const gradId = 'g0';
+      const useGrad = opts.useGradient;
+      const fill = useGrad ? `url(#${gradId})` : opts.color;
+      const stroke = opts.strokeWidth > 0 ? `stroke="${opts.strokeColor}" stroke-width="${opts.strokeWidth}" stroke-linecap="round" stroke-linejoin="round"` : '';
+
+      const hasShadow = (opts.shadowBlur > 0 || opts.shadowX !== 0 || opts.shadowY !== 0);
+
+      const tspans = lines.map((ln, i) => `<tspan x="${x}" dy="${i === 0 ? 0 : lineHeight}" font-family="${fontFamily}" font-size="${fontSize}" text-anchor="${anchor}">${escapeXml(ln)}</tspan>`).join('');
+
+      // include a fallback style to match loaded fonts (note: embedding fonts inside SVG is complex; this uses the page fonts)
+      const svg = `<?xml version="1.0" encoding="utf-8"?>\n` +
+        `<svg xmlns='http://www.w3.org/2000/svg' width='${w}' height='${h}' viewBox='0 0 ${w} ${h}' preserveAspectRatio='xMidYMid meet'>\n` +
+        `<defs>\n` +
+        `${useGrad ? `<linearGradient id='${gradId}' x1='0' y1='0' x2='1' y2='0'><stop offset='0%' stop-color='${opts.grad1}'/><stop offset='100%' stop-color='${opts.grad2}'/></linearGradient>` : ''}\n` +
+        `${hasShadow ? `<filter id='f1' x='-50%' y='-50%' width='200%' height='200%'><feDropShadow dx='${opts.shadowX}' dy='${opts.shadowY}' stdDeviation='${opts.shadowBlur}' flood-color='${opts.color}' flood-opacity='0.45'/></filter>` : ''}\n` +
+        `</defs>\n` +
+        `${opts.bgType === 'transparent' ? '' : `<rect width='100%' height='100%' fill='${opts.bgColor}'/>`}\n` +
+        `<g ${hasShadow ? `filter='url(#f1)'` : ''}>\n` +
+        `<text direction='rtl' xml:space='preserve' x='${x}' y='${startY}' fill='${fill}' ${stroke} font-family='${fontFamily}' font-weight='${opts.weight}' font-style='${opts.fstyle}' dominant-baseline='alphabetic' text-anchor='${anchor}'>${tspans}</text>\n` +
+        `</g>\n` +
+        `</svg>`;
+      return svg;
+    }
+
+    function renderPreview() {
+      try {
+        const opts = getOpts();
+        const svg = buildSVG(opts);
+        const preview = document.getElementById('preview');
+        preview.innerHTML = svg;
+      } catch (e) { console.error('Preview error', e); }
+    }
+
+    // wire inputs
+    const inputIds = ['text', 'font', 'weight', 'fstyle', 'size', 'color', 'useGradient', 'grad1', 'grad2', 'strokeWidth', 'strokeColor', 'shadowX', 'shadowY', 'shadowBlur', 'align', 'bgType', 'bgColor', 'format'];
+    inputIds.forEach(id => { const el = document.getElementById(id); if (el) { el.addEventListener('input', renderPreview); el.addEventListener('change', renderPreview); } });
+
+    // Download SVG
+    function downloadSVG() { try { const opts = getOpts(); const svg = buildSVG(opts); const blob = new Blob([svg], { type: 'image/svg+xml' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'arabic-calligraphy.svg'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url); } catch (e) { alert('SVG download failed: ' + e.message); } }
+    document.getElementById('downloadSvg').addEventListener('click', downloadSVG);
+
+    // Copy SVG to clipboard
+    document.getElementById('copySvg').addEventListener('click', async () => { try { const svg = buildSVG(getOpts()); await navigator.clipboard.writeText(svg); alert('SVG copied to clipboard'); } catch (e) { alert('Copy failed: ' + e.message); } });
+
+    // Download PNG - render SVG on canvas
+    function downloadPNG() {
+      try {
+        const opts = getOpts(); const svg = buildSVG(opts); const blob = new Blob([svg], { type: 'image/svg+xml;charset=utf-8' }); const url = URL.createObjectURL(blob); const img = new Image(); img.crossOrigin = 'anonymous'; img.onload = () => { try { const canvas = document.createElement('canvas'); canvas.width = Math.round(opts.format * 1.6); canvas.height = Math.round(opts.format); const ctx = canvas.getContext('2d'); if (opts.bgType !== 'transparent') { ctx.fillStyle = opts.bgColor; ctx.fillRect(0, 0, canvas.width, canvas.height); } ctx.drawImage(img, 0, 0, canvas.width, canvas.height); canvas.toBlob(b => { const u = URL.createObjectURL(b); const a = document.createElement('a'); a.href = u; a.download = 'arabic-calligraphy.png'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(u); }, 'image/png'); } catch (e) { alert('PNG export failed: ' + e.message); } URL.revokeObjectURL(url); };
+        img.onerror = (e) => { alert('Failed to render PNG. Try Download SVG instead.'); URL.revokeObjectURL(url); };
+        img.src = url;
+      } catch (e) { alert('PNG download failed: ' + e.message); }
+    }
+
+    document.getElementById('downloadPng').addEventListener('click', downloadPNG);
+
+    // initial render
+    renderPreview();
+  </script>
+</body>
+
+</html>
