@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Arabic Calligraphy Generator — Fixed</title>
+
+    <!-- Google fonts (many included for demo) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Aref+Ruqaa:wght@400;700&family=Rakkas&family=Lateef:wght@400;700&family=Scheherazade+New:wght@400;700&family=Katibeh&family=Marhey:wght@400;700&family=Markazi+Text:wght@400;700&family=Mirza:wght@400;700&family=Reem+Kufi:wght@400;700&family=Tajawal:wght@400;700&family=Cairo:wght@400;700&family=Changa:wght@400;700&family=Almarai:wght@400;700&family=Lalezar&family=Harmattan:wght@400;700&family=El+Messiri:wght@400;700&family=Jomhuria&family=Baloo+Bhaijaan+2:wght@400;700&family=Kufam:wght@400;700&family=Mada:wght@400;700&family=IBM+Plex+Sans+Arabic:wght@400;700&family=Readex+Pro:wght@400;700&family=Noto+Kufi+Arabic:wght@400;700&family=Noto+Naskh+Arabic:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- html2canvas for screenshot/export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+        /* --- layout & design (kept from your original, with small tweaks) --- */
+        * { box-sizing: border-box; margin:0; padding:0; }
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+            min-height:100vh;
+            padding:20px;
+            direction: rtl;
+            color: #222;
+        }
+        .container {
+            max-width:1400px;
+            margin:0 auto;
+            background:#fff;
+            border-radius:16px;
+            box-shadow:0 20px 60px rgba(0,0,0,0.25);
+            overflow:hidden;
+        }
+        .header {
+            background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+            color:#fff;
+            padding:34px 24px;
+            text-align:center;
+        }
+        .header h1 { font-size:2.2rem; margin-bottom:6px; font-weight:700; }
+        .header p { opacity:.95; margin-top:4px; font-size:1rem; }
+
+        .main-content {
+            display:grid;
+            grid-template-columns: 380px 1fr 320px;
+            gap:0;
+            min-height:640px;
+        }
+
+        .controls, .sidebar {
+            background:#f8f9fa;
+            padding:22px;
+            overflow-y:auto;
+            max-height:900px;
+        }
+
+        .controls { border-left: 2px solid #e6e6e6; }
+        .sidebar { border-right: 2px solid #e6e6e6; }
+
+        .control-group { margin-bottom:20px; }
+        .control-group label { display:block; margin-bottom:8px; font-weight:700; color:#333; font-size:0.95em; }
+
+        .label-badge { display:inline-block; background:#667eea; color:#fff; padding:2px 8px; border-radius:6px; font-size:0.78em; margin-left:6px; }
+
+        textarea { width:100%; padding:12px; border:2px solid #ddd; border-radius:8px; font-size:1.05rem; min-height:120px; resize:vertical; direction:rtl; font-family: 'Cairo', sans-serif; }
+        textarea:focus { border-color:#667eea; outline:none; }
+
+        .char-count { text-align:left; font-size:0.85em; color:#666; margin-top:6px; }
+
+        .quick-examples { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:10px; }
+        .example-btn { padding:8px 10px; background:#fff; border:1px solid #ddd; border-radius:6px; cursor:pointer; font-size:0.9rem; }
+        .example-btn:hover { border-color:#667eea; transform:translateY(-2px); }
+
+        select { width:100%; padding:10px; border-radius:8px; border:2px solid #ddd; background:#fff; }
+        .font-preview { background:#fff; padding:12px; border-radius:8px; border:1px solid #e6e6e6; margin-top:10px; }
+        .font-preview-text { font-size:1.3rem; margin-bottom:8px; text-align:center; }
+
+        .size-buttons { display:grid; grid-template-columns: repeat(4,1fr); gap:8px; margin-bottom:10px; }
+        .size-btn { padding:10px; border-radius:8px; border:1px solid #ddd; background:#fff; font-weight:700; cursor:pointer; }
+        .size-btn.active { background:#667eea; color:#fff; border-color:#667eea; transform:translateY(-2px); }
+
+        input[type=range] { width:100%; margin-top:6px; }
+
+        .color-section { background:#fff; padding:12px; border-radius:8px; border:1px solid #e6e6e6; margin-bottom:12px; }
+        .color-input-group { display:flex; gap:12px; align-items:center; }
+        input[type=color] { width:60px; height:40px; border:1px solid #ddd; border-radius:6px; cursor:pointer; }
+        .color-value { flex:1; padding:8px; background:#f8f9fa; border-radius:6px; font-family: monospace; font-size:.92rem; }
+
+        .quick-colors { display:grid; grid-template-columns:repeat(6,1fr); gap:8px; margin-top:8px; }
+        .quick-color { height:40px; border-radius:6px; cursor:pointer; border:2px solid transparent; transition:all .18s; }
+        .quick-color:hover { transform:scale(1.05); border-color:#333; }
+
+        .checkbox-group { display:flex; gap:10px; align-items:center; padding:8px; background:#fff; border-radius:8px; border:1px solid #e6e6e6; }
+
+        .align-buttons { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:8px; }
+        .align-btn { padding:10px; border-radius:8px; background:#fff; border:1px solid #ddd; cursor:pointer; font-weight:700; }
+        .align-btn.active { background:#667eea; color:#fff; border-color:#667eea; transform:translateY(-2px); }
+
+        .preview-area { padding:30px; display:flex; align-items:center; justify-content:center; background:#ffffff; min-height:520px; }
+        #preview {
+            padding:40px;
+            border-radius:12px;
+            min-height:300px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            text-align:right;
+            transition:all .2s;
+            max-width:100%;
+            word-wrap:break-word;
+            box-shadow:0 12px 30px rgba(0,0,0,0.08);
+            /* default background white */
+            background: #ffffff;
+        }
+
+        .button-group { display:grid; gap:10px; margin-top:12px; }
+        button { padding:12px; border-radius:8px; border:none; cursor:pointer; font-weight:700; font-size:0.95rem; }
+        .btn-primary { background:linear-gradient(135deg,#667eea 0%, #764ba2 100%); color:#fff; }
+        .btn-success { background:#28a745; color:#fff; }
+
+        .sidebar .section-title { font-size:1.05rem; font-weight:700; margin-bottom:12px; padding-bottom:8px; border-bottom:2px solid #eee; }
+        .stats-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px; }
+        .stat-card { background:#fff; padding:12px; border-radius:8px; text-align:center; border:1px solid #e6e6e6; }
+        .stat-value { font-size:1.5rem; font-weight:800; color:#667eea; }
+        .stat-label { font-size:.9rem; color:#666; margin-top:6px; }
+
+        .info-box { background:#e7f3ff; border-right:4px solid #2196F3; padding:12px; border-radius:8px; margin-bottom:12px; font-size:.95rem; color:#333; }
+        .info-box h4 { color:#1976D2; margin-bottom:8px; }
+
+        @media (max-width:1200px) {
+            .main-content { grid-template-columns: 1fr; }
+            .controls, .sidebar { border:none; border-top:2px solid #e6e6e6; max-height:none; }
+            .preview-area { min-height:420px; padding:18px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎨 مولد الخط العربي الاحترافي</h1>
+            <p>أنشئ تصاميم خطية عربية جميلة مع أكثر من 30 خط احترافي — معاينة فورية وتصدير PNG / JPG</p>
+        </div>
+
+        <div class="main-content">
+            <!-- LEFT: CONTROLS -->
+            <div class="controls">
+                <div class="control-group">
+                    <label><span class="label-badge">RTL</span> النص العربي <span class="label-badge">تحديث تلقائي</span></label>
+                    <textarea id="arabicText" placeholder="اكتب النص العربي هنا...">بسم الله الرحمن الرحيم</textarea>
+                    <div class="char-count">عدد الأحرف: <span id="charCount">0</span></div>
+                    <a href="https://www.branah.com/arabic" target="_blank" rel="noopener" class="help-link">هل تحتاج مساعدة في الكتابة بالعربية؟</a>
+                </div>
+
+                <div class="control-group">
+                    <label><span class="label-badge">نقرة واحدة</span> أمثلة سريعة</label>
+                    <div class="quick-examples" id="quickExamples"></div>
+                </div>
+
+                <div class="control-group">
+                    <label><span class="label-badge">30+ خط</span> عائلة الخط</label>
+                    <select id="fontFamily" aria-label="اختر عائلة الخط">
+                        <optgroup label="خطوط تقليدية">
+                            <option value="Amiri">أميري - Amiri</option>
+                            <option value="Aref Ruqaa">عارف رقعة - Aref Ruqaa</option>
+                            <option value="Rakkas">رقّاص - Rakkas</option>
+                            <option value="Lateef">لطيف - Lateef</option>
+                            <option value="Scheherazade New">شهرزاد - Scheherazade</option>
+                            <option value="Katibeh">كاتبة - Katibeh</option>
+                        </optgroup>
+                        <optgroup label="خطوط كوفية">
+                            <option value="Reem Kufi">ريم كوفي - Reem Kufi</option>
+                            <option value="Noto Kufi Arabic">نوتو كوفي - Noto Kufi</option>
+                            <option value="Kufam">كوفام - Kufam</option>
+                        </optgroup>
+                        <optgroup label="خطوط نسخ">
+                            <option value="Noto Naskh Arabic">نوتو نسخ - Noto Naskh</option>
+                        </optgroup>
+                        <optgroup label="خطوط حديثة">
+                            <option value="Cairo">القاهرة - Cairo</option>
+                            <option value="Tajawal">تجوال - Tajawal</option>
+                            <option value="Almarai">المرعي - Almarai</option>
+                            <option value="Changa">شنقا - Changa</option>
+                            <option value="Marhey">مرحي - Marhey</option>
+                            <option value="Harmattan">هرمتان - Harmattan</option>
+                            <option value="El Messiri">المسيري - El Messiri</option>
+                            <option value="Mada">مدى - Mada</option>
+                            <option value="Readex Pro">ريدكس برو - Readex Pro</option>
+                            <option value="IBM Plex Sans Arabic">IBM عربي - IBM Plex</option>
+                        </optgroup>
+                        <optgroup label="خطوط زخرفية">
+                            <option value="Lalezar">لالزار - Lalezar</option>
+                            <option value="Jomhuria">جمهورية - Jomhuria</option>
+                            <option value="Vibes">فايبس - Vibes</option>
+                            <option value="Blaka">بلاكا - Blaka</option>
+                            <option value="Baloo Bhaijaan 2">بالو بهايجان - Baloo</option>
+                        </optgroup>
+                        <optgroup label="مزيد من الخطوط">
+                            <option value="Markazi Text">مركزي - Markazi Text</option>
+                            <option value="Mirza">ميرزا - Mirza</option>
+                            <option value="Reem Kufi">ريم كوفي - Reem Kufi</option>
+                        </optgroup>
+                    </select>
+                </div>
+
+                <div class="font-preview">
+                    <div class="font-preview-text" id="fontPreviewText">بسم الله الرحمن الرحيم</div>
+                    <div class="font-description" id="fontDescription">
+                        <strong>الاختيار الحالي: Amiri</strong><br>
+                        خط عربي تقليدي أنيق - مثالي للنصوص الزخرفية والعناوين
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label>حجم الخط: <span id="fontSizeValue">48</span>px</label>
+                    <div class="size-buttons" id="sizeButtons">
+                        <button class="size-btn" data-size="24">S</button>
+                        <button class="size-btn active" data-size="48">M</button>
+                        <button class="size-btn" data-size="72">L</button>
+                        <button class="size-btn" data-size="96">XL</button>
+                    </div>
+                    <input type="range" id="fontSize" min="20" max="260" value="48">
+                </div>
+
+                <div class="control-group">
+                    <div class="section-title">الألوان والأنماط</div>
+
+                    <div class="color-section">
+                        <label>لون النص</label>
+                        <div class="color-input-group">
+                            <input type="color" id="textColor" value="#000000">
+                            <div class="color-value" id="textColorValue">#000000</div>
+                        </div>
+                    </div>
+
+                    <div class="checkbox-group" style="margin-top:10px;">
+                        <input type="checkbox" id="transparentBg">
+                        <label for="transparentBg">خلفية شفافة</label>
+                    </div>
+
+                    <div class="color-section">
+                        <label>لون الخلفية <span style="font-size:0.85em;color:#666;">(انقر شفاف لإزالة الخلفية)</span></label>
+                        <div class="color-input-group">
+                            <input type="color" id="bgColor" value="#ffffff">
+                            <div class="color-value" id="bgColorValue">#ffffff</div>
+                        </div>
+                    </div>
+
+                    <label>الألوان السريعة</label>
+                    <div class="quick-colors" id="quickColors">
+                        <div class="quick-color" data-color="#000000" style="background:#000000;"></div>
+                        <div class="quick-color" data-color="#8B4513" style="background:#8B4513;"></div>
+                        <div class="quick-color" data-color="#006400" style="background:#006400;"></div>
+                        <div class="quick-color" data-color="#DC143C" style="background:#DC143C;"></div>
+                        <div class="quick-color" data-color="#FFD700" style="background:#FFD700;"></div>
+                        <div class="quick-color" data-color="#4B0082" style="background:#4B0082;"></div>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label><span class="label-badge">RTL جاهز</span> محاذاة النص</label>
+                    <div class="align-buttons" id="alignButtons">
+                        <button class="align-btn active" data-align="right">يمين</button>
+                        <button class="align-btn" data-align="center">وسط</button>
+                        <button class="align-btn" data-align="left">يسار</button>
+                    </div>
+                    <div style="font-size:0.85rem;color:#666;margin-top:8px;text-align:center">الحالي: تدفق النص العربي الطبيعي من اليمين إلى اليسار</div>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn-primary" id="downloadPng">⬇️ تنزيل PNG (شفاف)</button>
+                    <button class="btn-success" id="downloadJpg">⬇️ تنزيل JPG (خلفية بيضاء)</button>
+                </div>
+            </div>
+
+            <!-- CENTER: PREVIEW -->
+            <div class="preview-area">
+                <div id="preview" role="img" aria-label="معاينة الخط">
+                    بسم الله الرحمن الرحيم
+                </div>
+            </div>
+
+            <!-- RIGHT: SUMMARY / SIDEBAR -->
+            <div class="sidebar">
+                <div class="section-title">ملخص الإعدادات <span class="label-badge">مباشر</span></div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="statChars">0</div>
+                        <div class="stat-label">عدد الأحرف</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statSize">48px</div>
+                        <div class="stat-label">حجم الخط</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statAlign">يمين</div>
+                        <div class="stat-label">المحاذاة</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statBg">صلب</div>
+                        <div class="stat-label">الخلفية</div>
+                    </div>
+                </div>
+
+                <div class="info-box">
+                    <h4>خيارات الخلفية:</h4>
+                    <ul>
+                        <li>• شفاف: مثالي للشعارات والتراكبات</li>
+                        <li>• ألوان صلبة: الأفضل للتصاميم المستقلة</li>
+                        <li>• صيغة PNG تحافظ على الشفافية</li>
+                        <li>• صيغة JPG تستخدم خلفية بيضاء</li>
+                    </ul>
+                </div>
+
+                <div class="info-box">
+                    <h4>نصائح التصدير:</h4>
+                    <ul>
+                        <li>• PNG للويب ووسائل التواصل</li>
+                        <li>• JPG لأحجام ملفات أصغر</li>
+                        <li>• التباين العالي يحسن القراءة</li>
+                        <li>• الخلفيات الشفافة رائعة للشعارات</li>
+                    </ul>
+                </div>
+
+                <div class="info-box" style="background:#fff3cd;border-right-color:#ffc107;">
+                    <h4>الخلفية الحالية:</h4>
+                    <div id="currentBgInfo" style="font-family:monospace;font-size:1.05rem;font-weight:700;color:#856404;">#ffffff</div>
+                    <div style="margin-top:8px;font-size:0.92rem">لون خلفية صلب. يعمل مع صيغتي PNG و JPG.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* ---------- grab DOM ---------- */
+        const arabicText = document.getElementById('arabicText');
+        const fontFamily = document.getElementById('fontFamily');
+        const fontSize = document.getElementById('fontSize');
+        const fontSizeValue = document.getElementById('fontSizeValue');
+        const textColor = document.getElementById('textColor');
+        const textColorValue = document.getElementById('textColorValue');
+        const bgColor = document.getElementById('bgColor');
+        const bgColorValue = document.getElementById('bgColorValue');
+        const transparentBg = document.getElementById('transparentBg');
+        const preview = document.getElementById('preview');
+        const charCount = document.getElementById('charCount');
+        const fontPreviewText = document.getElementById('fontPreviewText');
+        const fontDescription = document.getElementById('fontDescription');
+        const currentBgInfo = document.getElementById('currentBgInfo');
+        const statChars = document.getElementById('statChars');
+        const statSize = document.getElementById('statSize');
+        const statAlign = document.getElementById('statAlign');
+        const statBg = document.getElementById('statBg');
+
+        const quickExamplesContainer = document.getElementById('quickExamples');
+        const quickColors = Array.from(document.querySelectorAll('.quick-color'));
+        const sizeButtons = Array.from(document.querySelectorAll('.size-btn'));
+        const alignButtons = Array.from(document.querySelectorAll('.align-btn'));
+        const downloadPng = document.getElementById('downloadPng');
+        const downloadJpg = document.getElementById('downloadJpg');
+
+        /* ---------- initial data ---------- */
+        const examples = ['بسم الله الرحمن الرحيم', 'الحمد لله رب العالمين', 'لا إله إلا الله', 'السلام عليكم ورحمة الله', 'الله أكبر', 'ما شاء الله'];
+        const fontDescriptions = {
+            'Amiri': 'خط عربي تقليدي أنيق - مثالي للنصوص الزخرفية والعناوين',
+            'Aref Ruqaa': 'خط الرقعة التقليدي - مقروء وجميل للاستخدام اليومي',
+            'Rakkas': 'خط زخرفي جذاب - مثالي للعناوين والشعارات',
+            'Lateef': 'خط نسخ تقليدي - واضح ومناسب للنصوص الطويلة',
+            'Scheherazade New': 'خط شهرزاد الكلاسيكي - أنيق ومتعدد الاستخدامات',
+            'Cairo': 'خط حديث وعصري - مثالي للتصاميم المعاصرة',
+            'Reem Kufi': 'خط كوفي هندسي - قوي وحديث',
+            'Tajawal': 'خط عصري نظيف - مثالي للواجهات والتطبيقات',
+            'Almarai': 'خط المرعي الحديث - واضح وعصري',
+            'Changa': 'خط شنقا - قوي وجذاب',
+            'Marhey': 'خط مرحي - فريد ومميز',
+            'Harmattan': 'خط هرمتان - أنيق ومقروء',
+            'El Messiri': 'خط المسيري - تقليدي جميل'
+        };
+
+        /* ---------- helpers ---------- */
+        function safeFontFamily(name) {
+            // quote names that have spaces so CSS font-family works
+            if (/\s/.test(name)) return `"${name}"`;
+            return name;
+        }
+
+        function countChars(str) {
+            // basic char count; this is good enough for UI
+            return Array.from(str).length;
+        }
+
+        /* ---------- populate quick examples ---------- */
+        examples.forEach(ex => {
+            const btn = document.createElement('button');
+            btn.className = 'example-btn';
+            btn.type = 'button';
+            btn.textContent = ex;
+            btn.addEventListener('click', () => {
+                arabicText.value = ex;
+                updatePreview();
+            });
+            quickExamplesContainer.appendChild(btn);
+        });
+
+        /* ---------- wire quick colors ---------- */
+        quickColors.forEach(el => {
+            el.addEventListener('click', () => {
+                const color = el.dataset.color || window.getComputedStyle(el).backgroundColor;
+                textColor.value = color;
+                textColorValue.textContent = color;
+                updatePreview();
+            });
+        });
+
+        /* ---------- size buttons logic ---------- */
+        sizeButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                sizeButtons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                const s = parseInt(btn.dataset.size, 10) || 48;
+                fontSize.value = s;
+                fontSizeValue.textContent = s;
+                updatePreview();
+            });
+        });
+
+        /* ---------- align buttons logic ---------- */
+        alignButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                alignButtons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                const align = btn.dataset.align || 'right';
+                preview.style.textAlign = align;
+                updatePreview(); // updates statAlign as well
+            });
+        });
+
+        /* ---------- event listeners for main inputs ---------- */
+        arabicText.addEventListener('input', updatePreview);
+        fontFamily.addEventListener('change', updatePreview);
+        fontSize.addEventListener('input', () => {
+            fontSizeValue.textContent = fontSize.value;
+            // set size buttons active if matching
+            sizeButtons.forEach(b => {
+                if (String(b.dataset.size) === String(fontSize.value)) {
+                    sizeButtons.forEach(x => x.classList.remove('active'));
+                    b.classList.add('active');
+                }
+            });
+            updatePreview();
+        });
+        textColor.addEventListener('input', () => {
+            textColorValue.textContent = textColor.value;
+            updatePreview();
+        });
+        bgColor.addEventListener('input', () => {
+            bgColorValue.textContent = bgColor.value;
+            updatePreview();
+        });
+        transparentBg.addEventListener('change', updatePreview);
+
+        /* ---------- preview & stats ---------- */
+        function updatePreview() {
+            const text = arabicText.value || '';
+            // set content safely
+            preview.textContent = text || 'اكتب النص هنا';
+            // set font family (quote if needed)
+            preview.style.fontFamily = `${safeFontFamily(fontFamily.value)}, sans-serif`;
+            document.getElementById('fontPreviewText').style.fontFamily = preview.style.fontFamily;
+            // font size & color
+            preview.style.fontSize = parseInt(fontSize.value, 10) + 'px';
+            fontSizeValue.textContent = fontSize.value;
+            preview.style.color = textColor.value;
+            textColorValue.textContent = textColor.value;
+            // background handling
+            if (transparentBg.checked) {
+                // transparent background visually - show checkerboard-looking pattern for preview
+                preview.style.background = 'repeating-linear-gradient(45deg, #f8f8f8 0, #f8f8f8 10px, #ffffff 10px, #ffffff 20px)';
+                statBg.textContent = 'شفاف';
+                currentBgInfo.textContent = 'شفاف';
+            } else {
+                preview.style.background = bgColor.value || '#ffffff';
+                statBg.textContent = 'صلب';
+                currentBgInfo.textContent = bgColor.value || '#ffffff';
+            }
+            // alignment
+            const currentAlignBtn = document.querySelector('.align-btn.active');
+            const align = currentAlignBtn ? currentAlignBtn.dataset.align : 'right';
+            preview.style.textAlign = align;
+            statAlign.textContent = (align === 'right') ? 'يمين' : (align === 'center') ? 'وسط' : 'يسار';
+            // update preview font info & description
+            const ff = fontFamily.value;
+            document.getElementById('fontPreviewText').textContent = text || 'مثال: بسم الله الرحمن الرحيم';
+            document.getElementById('fontDescription').innerHTML = `<strong>الاختيار الحالي: ${ff}</strong><br>${fontDescriptions[ff] || 'خط متاح للاستخدام — غيّر الإعدادات لمعاينة النتيجة'}`;
+            // statistics
+            const chars = countChars(text);
+            charCount.textContent = chars;
+            statChars.textContent = chars;
+            statSize.textContent = fontSize.value + 'px';
+        }
+
+        /* ---------- export functions using html2canvas ---------- */
+        function downloadCanvasAsPNG(transparent = true) {
+            // temporarily remove checkerboard CSS so html2canvas gets correct background
+            const prevBg = preview.style.background;
+            const useBg = transparent ? null : (bgColor.value || '#ffffff');
+
+            // html2canvas supports backgroundColor option (use null for transparent)
+            html2canvas(preview, {
+                backgroundColor: useBg,
+                scale: Math.min(3, window.devicePixelRatio || 2) // reasonable scale for good quality
+            }).then(canvas => {
+                canvas.toBlob(function(blob) {
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = transparent ? 'calligraphy.png' : 'calligraphy_with_bg.png';
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                    URL.revokeObjectURL(url);
+                }, 'image/png');
+            }).catch(err => {
+                alert('خطأ في إنشاء الصورة — حاول استخدام متصفح حديث أو استضف الصفحة على خادم.');
+                console.error(err);
+            });
+        }
+
+        function downloadCanvasAsJPG() {
+            // force white background for JPG
+            html2canvas(preview, {
+                backgroundColor: '#ffffff',
+                scale: Math.min(3, window.devicePixelRatio || 2)
+            }).then(canvas => {
+                const data = canvas.toDataURL('image/jpeg', 0.92);
+                const a = document.createElement('a');
+                a.href = data;
+                a.download = 'calligraphy.jpg';
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+            }).catch(err => {
+                alert('فشل إنشاء JPG — حاول في متصفح آخر أو استضف الصفحة.');
+                console.error(err);
+            });
+        }
+
+        /* ---------- hook export buttons ---------- */
+        downloadPng.addEventListener('click', () => downloadCanvasAsPNG(true));
+        downloadJpg.addEventListener('click', () => downloadCanvasAsJPG());
+
+        /* ---------- initial render ---------- */
+        // set initial UI values and render
+        (function init() {
+            // populate quick examples already done above
+            // ensure preview displays initial state
+            fontSizeValue.textContent = fontSize.value;
+            textColorValue.textContent = textColor.value;
+            bgColorValue.textContent = bgColor.value;
+            updatePreview();
+        })();
+
+        /* ---------- Accessibility & keyboard support (optional) ---------- */
+        // allow pressing Enter in the textarea to update preview immediately (already automatic), but enable ctrl+enter for quick export if desired
+        arabicText.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'Enter') {
+                // ctrl+enter to export PNG
+                downloadCanvasAsPNG(true);
+            }
+        });
+    </script>
+</body>
+</html>
