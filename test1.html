@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Arabic Calligraphy Generator — Emerald + Gold Edition</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Amiri&family=Aref+Ruqaa&family=Rakkas&family=Lateef&family=Scheherazade+New&family=Katibeh&family=Reem+Kufi&family=Noto+Kufi+Arabic&family=Kufam&family=Noto+Naskh+Arabic&family=Cairo&family=Tajawal&family=Almarai&family=Changa&family=Marhey&family=Harmattan&family=El+Messiri&family=Mada&family=Readex+Pro&family=IBM+Plex+Sans+Arabic&family=Lalezar&family=Jomhuria&family=Vibes&family=Blaka&family=Baloo+Bhaijaan+2&family=Markazi+Text&family=Mirza&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+:root{
+ --emerald:#00897b;
+ --gold:#d4af37;
+ --bg-light:#f9f9f9;
+ --radius:12px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+ font-family:'Cairo',sans-serif;
+ background:linear-gradient(135deg,var(--emerald)0%,#00695c 100%);
+ color:#222;direction:rtl;
+ min-height:100vh;padding:20px;
+}
+.container{
+ max-width:1600px;margin:auto;background:#fff;border-radius:var(--radius);
+ box-shadow:0 20px 60px rgba(0,0,0,.25);overflow:hidden
+}
+.header{
+ background:linear-gradient(135deg,var(--emerald),var(--gold));
+ color:#fff;text-align:center;padding:35px 20px
+}
+.header h1{font-size:2.4rem;margin-bottom:10px;font-weight:700}
+.header p{font-size:1rem;opacity:.9}
+.main{display:grid;grid-template-columns:370px 1fr 330px;min-height:700px}
+.controls,.sidebar{background:var(--bg-light);padding:22px;overflow:auto}
+.controls{border-left:2px solid #eee}
+.sidebar{border-right:2px solid #eee}
+.preview-area{display:flex;align-items:center;justify-content:center;background:#fff;padding:30px}
+#preview{
+ padding:60px;min-height:360px;text-align:center;
+ border-radius:var(--radius);transition:.3s all;
+ background:#fff;box-shadow:0 10px 30px rgba(0,0,0,.08);
+ word-wrap:break-word;max-width:100%
+}
+.control-group{margin-bottom:20px}
+label{font-weight:700;font-size:.95rem;margin-bottom:6px;display:block}
+textarea,select,input[type=color],input[type=range]{
+ width:100%;border:2px solid #ddd;border-radius:8px;padding:10px;font-family:'Cairo',sans-serif
+}
+textarea{min-height:100px;resize:vertical}
+textarea:focus,select:focus{border-color:var(--emerald);outline:none}
+.color-box{display:flex;align-items:center;gap:10px}
+.color-value{flex:1;background:#f0f0f0;padding:6px 8px;border-radius:6px;font-family:monospace}
+.quick-colors{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-top:8px}
+.quick-color{height:35px;border-radius:6px;cursor:pointer;transition:.2s;border:2px solid transparent}
+.quick-color:hover{transform:scale(1.1);border-color:#333}
+.align-buttons,.size-buttons{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}
+button{cursor:pointer;border:none;border-radius:8px;padding:10px 14px;font-weight:700;transition:.3s all}
+.btn-primary{background:linear-gradient(135deg,var(--emerald),var(--gold));color:#fff}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 12px rgba(0,0,0,.2)}
+.size-btn,.align-btn{border:2px solid #ddd;background:#fff}
+.size-btn.active,.align-btn.active{background:var(--emerald);color:#fff;border-color:var(--emerald)}
+#bgImagePreview{max-width:100%;margin-top:10px;border-radius:8px}
+input[type=range]{accent-color:var(--emerald)}
+@media(max-width:1200px){.main{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="container">
+ <div class="header">
+  <h1>🎨 Arabic Calligraphy Generator</h1>
+  <p>Beautiful Arabic Font Designs — Emerald & Gold Edition</p>
+ </div>
+ <div class="main">
+  <div class="controls">
+   <div class="control-group">
+    <label>النص العربي</label>
+    <textarea id="textInput">بسم الله الرحمن الرحيم</textarea>
+   </div>
+   <div class="control-group">
+    <label>الخط</label>
+    <select id="fontSelect">
+     <optgroup label="خطوط تقليدية">
+      <option>Amiri</option><option>Aref Ruqaa</option><option>Rakkas</option>
+      <option>Lateef</option><option>Scheherazade New</option><option>Katibeh</option>
+     </optgroup>
+     <optgroup label="خطوط كوفية">
+      <option>Reem Kufi</option><option>Noto Kufi Arabic</option><option>Kufam</option>
+     </optgroup>
+     <optgroup label="خطوط نسخ"><option>Noto Naskh Arabic</option></optgroup>
+     <optgroup label="حديثة">
+      <option>Cairo</option><option>Tajawal</option><option>Almarai</option><option>Changa</option><option>Marhey</option><option>Harmattan</option><option>El Messiri</option><option>Mada</option><option>Readex Pro</option><option>IBM Plex Sans Arabic</option>
+     </optgroup>
+     <optgroup label="زخرفية">
+      <option>Lalezar</option><option>Jomhuria</option><option>Vibes</option><option>Blaka</option><option>Baloo Bhaijaan 2</option>
+     </optgroup>
+     <optgroup label="مزيد من الخطوط">
+      <option>Markazi Text</option><option>Mirza</option>
+     </optgroup>
+    </select>
+   </div>
+   <div class="control-group">
+    <label>الحجم <span id="sizeValue">48</span>px</label>
+    <input type="range" id="fontSize" min="20" max="150" value="48">
+   </div>
+   <div class="control-group">
+    <label>لون النص</label>
+    <div class="color-box"><input type="color" id="textColor" value="#000000"><div class="color-value" id="textColorVal">#000000</div></div>
+    <div class="quick-colors">
+     <div class="quick-color" data-color="#000"></div>
+     <div class="quick-color" data-color="#006400" style="background:#006400"></div>
+     <div class="quick-color" data-color="#b8860b" style="background:#b8860b"></div>
+     <div class="quick-color" data-color="#dc143c" style="background:#dc143c"></div>
+     <div class="quick-color" data-color="#4b0082" style="background:#4b0082"></div>
+     <div class="quick-color" data-color="#ffd700" style="background:#ffd700"></div>
+    </div>
+   </div>
+   <div class="control-group">
+    <label>الخلفية</label>
+    <input type="color" id="bgColor" value="#ffffff">
+    <input type="file" id="bgImage" accept="image/*">
+    <img id="bgImagePreview" alt="">
+   </div>
+   <div class="control-group">
+    <label>محاذاة النص</label>
+    <div class="align-buttons">
+     <button class="align-btn active" data-align="right">يمين</button>
+     <button class="align-btn" data-align="center">وسط</button>
+     <button class="align-btn" data-align="left">يسار</button>
+    </div>
+   </div>
+   <div class="control-group">
+    <label>الظل</label>
+    <input type="checkbox" id="textShadow"> تفعيل الظل
+   </div>
+   <div class="control-group">
+    <label>المسافة بين الحروف</label>
+    <input type="range" id="letterSpacing" min="0" max="20" value="0">
+   </div>
+   <div class="control-group">
+    <label>التوهج (حد خارجي)</label>
+    <input type="range" id="strokeWidth" min="0" max="10" value="0">
+    <input type="color" id="strokeColor" value="#d4af37">
+   </div>
+   <div class="control-group">
+    <button class="btn-primary" id="downloadPng">تحميل PNG</button>
+    <button class="btn-primary" id="downloadSvg">تحميل SVG</button>
+   </div>
+  </div>
+  <div class="preview-area"><div id="preview">بسم الله الرحمن الرحيم</div></div>
+  <div class="sidebar">
+   <h3 style="color:var(--emerald);margin-bottom:10px">الإعدادات</h3>
+   <p>• أضف خلفية أو لون أو صورة <br>• تحكم بالظل و الحدود <br>• نزّل النتيجة بصيغة PNG أو SVG</p>
+  </div>
+ </div>
+</div>
+<script>
+const txt=document.getElementById('textInput'),
+ fnt=document.getElementById('fontSelect'),
+ sz=document.getElementById('fontSize'),
+ szv=document.getElementById('sizeValue'),
+ tc=document.getElementById('textColor'),
+ tcv=document.getElementById('textColorVal'),
+ bc=document.getElementById('bgColor'),
+ bi=document.getElementById('bgImage'),
+ bip=document.getElementById('bgImagePreview'),
+ prev=document.getElementById('preview'),
+ alignBtns=document.querySelectorAll('.align-btn'),
+ sh=document.getElementById('textShadow'),
+ ls=document.getElementById('letterSpacing'),
+ sw=document.getElementById('strokeWidth'),
+ sc=document.getElementById('strokeColor');
+
+function update(){
+ prev.textContent=txt.value||'اكتب النص هنا';
+ prev.style.fontFamily=fnt.value;
+ prev.style.fontSize=sz.value+'px';
+ szv.textContent=sz.value;
+ prev.style.color=tc.value;
+ tcv.textContent=tc.value;
+ prev.style.backgroundColor=bc.value;
+ prev.style.letterSpacing=ls.value+'px';
+ if(sh.checked)prev.style.textShadow='2px 2px 4px rgba(0,0,0,0.4)';else prev.style.textShadow='none';
+ if(sw.value>0){prev.style.webkitTextStroke=sw.value+'px '+sc.value;prev.style.textStroke=sw.value+'px '+sc.value}else{prev.style.webkitTextStroke='';prev.style.textStroke=''}
+}
+document.querySelectorAll('.quick-color').forEach(c=>c.onclick=()=>{tc.value=c.dataset.color;update()});
+alignBtns.forEach(b=>b.onclick=()=>{alignBtns.forEach(x=>x.classList.remove('active'));b.classList.add('active');prev.style.textAlign=b.dataset.align});
+[txt,fnt,sz,tc,bc,sh,ls,sw,sc].forEach(e=>e.addEventListener('input',update));
+bi.onchange=e=>{
+ const file=e.target.files[0];if(!file)return;
+ const r=new FileReader();r.onload=ev=>{bip.src=ev.target.result;prev.style.backgroundImage=`url(${ev.target.result})`;prev.style.backgroundSize='cover';prev.style.backgroundPosition='center'};r.readAsDataURL(file)
+};
+function dlPNG(){
+ html2canvas(prev,{backgroundColor:null,scale:2}).then(c=>{
+  const a=document.createElement('a');a.download='arabic-calligraphy.png';a.href=c.toDataURL();a.click()
+ })
+}
+function dlSVG(){
+ const svg=`<svg xmlns='http://www.w3.org/2000/svg' width='1200' height='400'><style>@import url('https://fonts.googleapis.com/css2?family=${fnt.value.replace(/ /g,'+')}&display=swap');</style><rect width='100%' height='100%' fill='${bc.value}'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' font-family='${fnt.value}' font-size='${sz.value}' fill='${tc.value}'>${txt.value}</text></svg>`;
+ const blob=new Blob([svg],{type:'image/svg+xml'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='arabic-calligraphy.svg';a.click()
+}
+document.getElementById('downloadPng').onclick=dlPNG;
+document.getElementById('downloadSvg').onclick=dlSVG;
+update();
+</script>
+</body>
+</html>
